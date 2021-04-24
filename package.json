@@ -1,0 +1,23 @@
+{
+  "name": "5eimport",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "monsters": "node ./monsters.js",
+    "items-base": "node ./items-base.js",
+    "items": "node ./items.js",
+    "spells": "node ./spells.js",
+    "races": "node ./races.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tony Mauro (tony@mauro.ca)",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "mongodb": "^4.0.0-beta.2",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {}
+}
