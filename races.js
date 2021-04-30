@@ -1,7 +1,6 @@
 import fs from "fs";
 import _ from "lodash";
 import { default as mongodb } from "mongodb";
-import * as parser from "./parser.js";
 
 const uri =
   "mongodb+srv://testUser:mongo.cattle.60@cluster0.vbl9h.mongodb.net/?retryWrites=true&w=majority";
@@ -28,7 +27,10 @@ const main = async () => {
           id: `${item.name.replace(/\W/g, "")}-${item.source}-${
             item.page
           }`.toLowerCase(),
-          ..._.merge(item, itemFluff),
+          ...item,
+          images: itemFluff.images || [],
+          entriesFluff: itemFluff.entries || [],
+          // ..._.merge(item, itemFluff),
         };
       })
     );

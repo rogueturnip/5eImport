@@ -21,6 +21,7 @@ const main = async () => {
           id: `${item.name.replace(/\W/g, "")}-${item.source}-${
             item.page
           }`.toLowerCase(),
+          base: true,
           ...item,
         };
       })

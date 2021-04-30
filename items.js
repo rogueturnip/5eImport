@@ -28,7 +28,10 @@ const main = async () => {
           id: `${item.name.replace(/\W/g, "")}-${item.source}-${
             item.page
           }`.toLowerCase(),
-          ..._.merge(item, itemFluff),
+          base: false,
+          // ..._.merge(item, itemFluff),
+          ...item,
+          images: itemFluff.images || [],
         };
       })
     );
