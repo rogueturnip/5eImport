@@ -52,9 +52,6 @@ const main = async (filename) => {
         const update = { $set: item };
         const options = { upsert: true };
         await dbo.collection("spells").updateOne(query, update, options);
-        // const updateMonster = formatMonster(item);
-        // await dbo.collection("monsters").insertOne(updateMonster);
-        // console.log(`item ${updateMonster.id} ${updateMonster.name} inserted`);
       })
     );
   } catch (e) {

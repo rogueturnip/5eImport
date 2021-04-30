@@ -36,13 +36,13 @@ const main = async () => {
   try {
     await client.connect();
     const dbo = client.db("5e");
-    var text = await main("mm");
+    var text = await main();
     await Promise.all(
       text.map(async (item) => {
         const query = { id: item.id };
         const update = { $set: item };
         const options = { upsert: true };
-        await dbo.collection("itemsBase").updateOne(query, update, options);
+        await dbo.collection("items").updateOne(query, update, options);
       })
     );
   } catch (e) {
