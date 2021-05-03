@@ -10,6 +10,7 @@
     "items": "node ./items.js",
     "spells": "node ./spells.js",
     "races": "node ./races.js",
+    "classes": "node ./classes.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Tony Mauro (tony@mauro.ca)",
