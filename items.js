@@ -1,10 +1,9 @@
 import fs from "fs";
 import _ from "lodash";
 import { default as mongodb } from "mongodb";
-import * as parser from "./parser.js";
 
 const uri =
-  "mongodb+srv://testUser:mongo.cattle.60@cluster0.vbl9h.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://testUser:testPassword@cluster0.vbl9h.mongodb.net/?retryWrites=true&w=majority";
 const client = new mongodb.MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -31,7 +30,7 @@ const main = async () => {
           base: false,
           // ..._.merge(item, itemFluff),
           ...item,
-          images: itemFluff.images || [],
+          images: itemFluff?.images || [],
         };
       })
     );
