@@ -94,10 +94,10 @@ const main = async () => {
           await Promise.all(
             newClassItems.map(async (item) => {
               console.log(item.id);
-              //     const query = { id: item.id };
-              //     const update = { $set: item };
-              //     const options = { upsert: true };
-              //     await dbo.collection("classes").updateOne(query, update, options);
+              const query = { id: item.id };
+              const update = { $set: item };
+              const options = { upsert: true };
+              await dbo.collection("classes").updateOne(query, update, options);
             })
           );
         }
