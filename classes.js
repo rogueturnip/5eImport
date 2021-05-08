@@ -10,49 +10,99 @@ const client = new mongodb.MongoClient(uri, {
 });
 
 const main = async () => {
+  await client.connect();
+  const dbo = client.db("5e");
   const directoryPath =
     "/home/tony/projects/TheGiddyLimit.github.io/data/class";
   const classFiles = fs.readdirSync(directoryPath);
+  let classItems = [];
+  let classFeatures = [];
+  let subclassFeatures = [];
   try {
     await Promise.all(
-      classFiles.map((classFile) => {
+      classFiles.map(async (classFile) => {
         console.log("class file", classFile);
         if (classFile.startsWith("class")) {
-          const classItem = JSON.parse(
+          classItems = JSON.parse(
             fs.readFileSync(`${directoryPath}/${classFile}`, "utf8")
           ).class;
-          const classFeature = JSON.parse(
+          classFeatures = JSON.parse(
             fs.readFileSync(`${directoryPath}/${classFile}`, "utf8")
           ).classFeature;
-          const subclassFeature = JSON.parse(
+          subclassFeatures = JSON.parse(
             fs.readFileSync(`${directoryPath}/${classFile}`, "utf8")
           ).subclassFeature;
-          console.log(classItem);
+
+          const newClassItems = classItems.map((classItem) => {
+            // merge class features into one structure
+            const newClassFeatures = classItem?.classFeatures.map((feature) => {
+              if (typeof feature === "string") {
+                const values = feature.split("|");
+                return {
+                  gainSubclassFeature: false,
+                  ..._.find(classFeatures, {
+                    name: values[0],
+                    className: values[1],
+                    classSource: _.isEmpty(values[2]) ? "PHB" : values[2],
+                    level: parseInt(values[3]),
+                  }),
+                };
+              } else {
+                const values = feature.classFeature.split("|");
+                return {
+                  gainSubclassFeature: feature.gainSubclassFeature,
+                  ..._.find(classFeatures, {
+                    name: values[0],
+                    className: values[1],
+                    classSource: _.isEmpty(values[2]) ? "PHB" : values[2],
+                    level: parseInt(values[3]),
+                  }),
+                };
+              }
+            });
+            // merge subclass features into one structure
+            const newSubclass = classItem?.subclasses?.map((subclass) => {
+              // now loop through subclassFeatures array
+              const newFeatures = subclass?.subclassFeatures?.map((feature) => {
+                const values = feature.split("|");
+                return {
+                  ..._.find(subclassFeatures, {
+                    name: values[0],
+                    className: values[1],
+                    subclassSource: _.isEmpty(values[4]) ? "PHB" : values[4],
+                    subclassShortName: values[3],
+                    level: parseInt(values[5]),
+                  }),
+                };
+              });
+              return {
+                ...subclass,
+                subclassFeatures: _.isEmpty(newFeatures) ? [] : newFeatures,
+              };
+            });
+            return {
+              id: `${classItem.name.replace(/\W/g, "")}-${classItem.source}-${
+                classItem.page
+              }`.toLowerCase(),
+              ...classItem,
+              classFeatures: !_.isEmpty(newClassFeatures)
+                ? newClassFeatures
+                : [],
+              subclasses: !_.isEmpty(newSubclass) ? newSubclass : [],
+            };
+          });
+          await Promise.all(
+            newClassItems.map(async (item) => {
+              console.log(item.id);
+              //     const query = { id: item.id };
+              //     const update = { $set: item };
+              //     const options = { upsert: true };
+              //     await dbo.collection("classes").updateOne(query, update, options);
+            })
+          );
         }
       })
     );
-    // try {
-    //   const items = JSON.parse(fs.readFileSync(itemsFile, "utf8")).item;
-    //   const fluff = JSON.parse(fs.readFileSync(fluffFile, "utf8")).itemFluff;
-    //   console.log(`count items ${items.length} fluff ${fluff.length}`);
-    //   const newItems = await Promise.all(
-    //     items.map((item) => {
-    //       let itemFluff = {};
-    //       if (item.hasFluffImages) {
-    //         itemFluff = _.find(fluff, { name: item.name });
-    //       }
-    //       return {
-    //         id: `${item.name.replace(/\W/g, "")}-${item.source}-${
-    //           item.page
-    //         }`.toLowerCase(),
-    //         base: false,
-    //         // ..._.merge(item, itemFluff),
-    //         ...item,
-    //         images: itemFluff?.images || [],
-    //       };
-    //     })
-    //   );
-    //   return newItems;
   } catch (error) {
     throw new Error(error);
   }
@@ -60,17 +110,7 @@ const main = async () => {
 
 (async () => {
   try {
-    await client.connect();
-    const dbo = client.db("5e");
-    var text = await main();
-    // await Promise.all(
-    //   text.map(async (item) => {
-    //     const query = { id: item.id };
-    //     const update = { $set: item };
-    //     const options = { upsert: true };
-    //     await dbo.collection("items").updateOne(query, update, options);
-    //   })
-    // );
+    await main();
   } catch (e) {
     // Deal with the fact the chain failed
     console.log(e);
