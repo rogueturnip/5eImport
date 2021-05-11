@@ -3,7 +3,7 @@ import _ from "lodash";
 import { default as mongodb } from "mongodb";
 
 const uri =
-  "mongodb+srv://testUser:mongo.cattle.60@cluster0.vbl9h.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://testUser:testPassword@cluster0.vbl9h.mongodb.net/?retryWrites=true&w=majority";
 const client = new mongodb.MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -21,7 +21,7 @@ const main = async () => {
       races.map((item) => {
         let itemFluff = {};
         if (item.hasFluff) {
-          itemFluff = _.find(fluff, { name: item.name });
+          itemFluff = _.find(fluff, { name: item.name, source: item.source });
         }
         return {
           id: `${item.name.replace(/\W/g, "")}-${item.source}-${
