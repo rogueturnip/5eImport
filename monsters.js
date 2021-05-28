@@ -3,9 +3,7 @@ import _ from "lodash";
 import { default as mongodb } from "mongodb";
 // import * as parser from "./parser.js";
 
-const uri =
-  "mongodb+srv://testUser:testPassword@cluster0.vbl9h.mongodb.net/?retryWrites=true&w=majority";
-// "mongodb+srv://user:password@127.0.0.1/?retryWrites=true&w=majority";
+const uri = "";
 const client = new mongodb.MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
