@@ -1,4 +1,3 @@
-import fs from "fs";
 import _ from "lodash";
 import axios from "axios";
 import { default as mongodb } from "mongodb";
@@ -20,9 +19,6 @@ const main = async () => {
     `https://5e.tools/data/class/index.json`
   );
   const classFiles = Object.values(responseIndex.data);
-  // let classItems = [];
-  // let classFeatures = [];
-  // let subclassFeatures = [];
   try {
     await Promise.all(
       classFiles.map(async (classFile) => {
