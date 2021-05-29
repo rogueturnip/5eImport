@@ -57,7 +57,6 @@ const main = async (filename) => {
     await Promise.allSettled(
       spellSources.map(async (source) => {
         const sourceJson = responseIndex.data[source] || null;
-        console.log("sour", sourceJson);
         if (sourceJson !== null) {
           const result = await main(sourceJson);
           await Promise.all(

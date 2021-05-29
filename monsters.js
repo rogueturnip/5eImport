@@ -1,8 +1,7 @@
-import fs from "fs";
 import _ from "lodash";
 import axios from "axios";
 import { default as mongodb } from "mongodb";
-// import * as parser from "./parser.js";
+import { bestiarySources } from "./supportedSources.js";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -13,19 +12,21 @@ const client = new mongodb.MongoClient(uri, {
 });
 
 const main = async (filename) => {
-  const directoryPath =
-    "/home/tony/projects/TheGiddyLimit.github.io/data/bestiary";
-  const monsterFile = `${directoryPath}/bestiary-${filename}.json`;
-  const fluffFile = `${directoryPath}/fluff-bestiary-${filename}.json`;
-  const legendaryGroupsFile = `${directoryPath}/legendarygroups.json`;
+  const responseBestiary = await axios.get(
+    `https://5e.tools/data/bestiary/${filename}`
+  );
+  const responseBestiaryFluff = await axios.get(
+    `https://5e.tools/data/bestiary/fluff-${filename}`
+  );
+  const responseLegendaryGroup = await axios.get(
+    `https://5e.tools/data/bestiary/legendarygroups.json`
+  );
   try {
-    const monster = JSON.parse(fs.readFileSync(monsterFile, "utf8")).monster;
-    const fluff = JSON.parse(fs.readFileSync(fluffFile, "utf8")).monsterFluff;
-    const legendaryGroup = JSON.parse(
-      fs.readFileSync(legendaryGroupsFile, "utf8")
-    ).legendaryGroup;
+    const monster = responseBestiary.data.monster;
+    const fluff = responseBestiaryFluff.data.monsterFluff;
+    const legendaryGroup = responseLegendaryGroup.data.legendaryGroup;
     console.log(
-      `counts monster ${monster.length} fluff ${fluff.length} legendaryGroup ${legendaryGroup.length}`
+      `counts ${filename} monster ${monster.length} fluff ${fluff.length} legendaryGroup ${legendaryGroup.length}`
     );
     const newMonster = await Promise.all(
       monster.map((item) => {
@@ -70,13 +71,25 @@ const main = async (filename) => {
   try {
     await client.connect();
     const dbo = client.db("5e");
-    var text = await main("mm");
-    await Promise.all(
-      text.map(async (item) => {
-        const query = { id: item.id };
-        const update = { $set: item };
-        const options = { upsert: true };
-        await dbo.collection("monsters").updateOne(query, update, options);
+    const responseIndex = await axios.get(
+      "https://5e.tools/data/bestiary/index.json"
+    );
+    await Promise.allSettled(
+      bestiarySources.map(async (source) => {
+        const sourceJson = responseIndex.data[source] || null;
+        if (sourceJson !== null) {
+          const result = await main(sourceJson);
+          await Promise.all(
+            result.map(async (item) => {
+              const query = { id: item.id };
+              const update = { $set: item };
+              const options = { upsert: true };
+              await dbo
+                .collection("monsters")
+                .updateOne(query, update, options);
+            })
+          );
+        }
       })
     );
   } catch (e) {
