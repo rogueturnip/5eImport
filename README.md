@@ -32,3 +32,5 @@ npm run monsters
 npm run races
 npm run classes
 ```
+
+## Thanks to the 5e Tools team for some great data to work with. https://5e.tools
