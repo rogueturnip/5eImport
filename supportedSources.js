@@ -9,6 +9,20 @@ export const spellSources = [
   "XGE",
 ];
 
+export const classSources = [
+  "DMG",
+  "EGW",
+  "ERLW",
+  "GGR",
+  "MOT",
+  "PHB",
+  "PSA",
+  "PSK",
+  "SCAG",
+  "TCE",
+  "XGE",
+];
+
 export const bestiarySources = [
   "AI",
   "BGDIA",

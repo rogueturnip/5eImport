@@ -1,0 +1,4 @@
+Must use local files from /data/
+Was used to get sources from class files
+
+cat * | tr -d " \t," |grep \"source\" | sort --unique
