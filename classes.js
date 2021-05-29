@@ -31,27 +31,45 @@ const main = async () => {
         const subclassFeatures = responseClass.data.subclassFeature || [];
 
         const newClassItems = classItems.map((classItem) => {
+          // don't process classes from sources not supported
+          if (!classSources.includes(classItem.source)) return null;
           // merge class features into one structure
           const newClassFeatures = classItem?.classFeatures.map((feature) => {
             if (typeof feature === "string") {
-              const values = feature.split("|");
+              let values = feature.split("|");
+              values[2] = _.isEmpty(values[2]) ? "PHB" : values[2];
+              values[4] = _.isEmpty(values[4]) ? values[2] : values[4];
+              // don't process class features from sources not supported
+              if (
+                !classSources.includes(values[2]) ||
+                !classSources.includes(values[4])
+              )
+                return null;
               return {
                 gainSubclassFeature: false,
                 ..._.find(classFeatures, {
                   name: values[0],
                   className: values[1],
-                  classSource: _.isEmpty(values[2]) ? "PHB" : values[2],
+                  classSource: values[2],
                   level: parseInt(values[3]),
                 }),
               };
             } else {
-              const values = feature.classFeature.split("|");
+              let values = feature.classFeature.split("|");
+              values[2] = _.isEmpty(values[2]) ? "PHB" : values[2];
+              values[4] = _.isEmpty(values[4]) ? values[2] : values[4];
+              // don't process class features from sources not supported
+              if (
+                !classSources.includes(values[2]) ||
+                !classSources.includes(values[4])
+              )
+                return null;
               return {
                 gainSubclassFeature: feature.gainSubclassFeature,
                 ..._.find(classFeatures, {
                   name: values[0],
                   className: values[1],
-                  classSource: _.isEmpty(values[2]) ? "PHB" : values[2],
+                  classSource: values[2],
                   level: parseInt(values[3]),
                 }),
               };
@@ -59,14 +77,20 @@ const main = async () => {
           });
           // merge subclass features into one structure
           const newSubclass = classItem?.subclasses?.map((subclass) => {
+            // don't process classes from sources not supported
+            if (!classSources.includes(subclass.source)) return null;
             // now loop through subclassFeatures array
             const newFeatures = subclass?.subclassFeatures?.map((feature) => {
-              const values = feature.split("|");
+              let values = feature.split("|");
+              values[4] = _.isEmpty(values[4]) ? "PHB" : values[4];
+              console.log(values);
+              // don't process class features from sources not supported
+              if (!classSources.includes(values[4])) return null;
               return {
                 ..._.find(subclassFeatures, {
                   name: values[0],
                   className: values[1],
-                  subclassSource: _.isEmpty(values[4]) ? "PHB" : values[4],
+                  subclassSource: values[4],
                   subclassShortName: values[3],
                   level: parseInt(values[5]),
                 }),
@@ -78,22 +102,28 @@ const main = async () => {
             };
           });
           return {
-            id: `${classItem.name.replace(/\W/g, "")}-${classItem.source}-${
-              classItem.page
+            id: `${classItem.name.replace(/\W/g, "")}-${classItem?.source}-${
+              classItem?.page
             }`.toLowerCase(),
             ...classItem,
-            classFeatures: !_.isEmpty(newClassFeatures) ? newClassFeatures : [],
-            subclasses: !_.isEmpty(newSubclass) ? newSubclass : [],
+            classFeatures: !_.isEmpty(newClassFeatures)
+              ? newClassFeatures.filter((o) => o)
+              : [],
+            subclasses: !_.isEmpty(newSubclass)
+              ? newSubclass.filter((o) => o)
+              : [],
           };
         });
         await Promise.all(
-          newClassItems.map(async (item) => {
-            console.log(item.id);
-            const query = { id: item.id };
-            const update = { $set: item };
-            const options = { upsert: true };
-            await dbo.collection("classes").updateOne(query, update, options);
-          })
+          newClassItems
+            .filter((o) => o)
+            .map(async (item) => {
+              console.log(item.id);
+              const query = { id: item.id };
+              const update = { $set: item };
+              const options = { upsert: true };
+              await dbo.collection("classes").updateOne(query, update, options);
+            })
         );
       })
     );

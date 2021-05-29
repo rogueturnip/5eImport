@@ -13,7 +13,7 @@ Currently support
 - items and items base
 - spells
 - races
-- classes (does not allow selection of sources)
+- classes
 
 ### .ENV file
 
