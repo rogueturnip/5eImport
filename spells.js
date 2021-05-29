@@ -1,22 +1,30 @@
-import fs from "fs";
 import _ from "lodash";
+import axios from "axios";
 import { default as mongodb } from "mongodb";
+import { spellSources } from "./supportedSources.js";
 
-const uri = "m";
+import dotenv from "dotenv";
+dotenv.config();
+
+const uri = process.env.MONGODB;
 const client = new mongodb.MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 const main = async (filename) => {
-  const directoryPath =
-    "/home/tony/projects/TheGiddyLimit.github.io/data/spells";
-  const spellFile = `${directoryPath}/spells-${filename}.json`;
-  const fluffFile = `${directoryPath}/fluff-spells-${filename}.json`;
+  const responseSpells = await axios.get(
+    `https://5e.tools/data/spells/${filename}`
+  );
+  const responseSpellsFluff = await axios.get(
+    `https://5e.tools/data/spells/fluff-${filename}`
+  );
   try {
-    const spells = JSON.parse(fs.readFileSync(spellFile, "utf8")).spell;
-    const fluff = JSON.parse(fs.readFileSync(fluffFile, "utf8")).spellFluff;
-    console.log(`counts spells ${spells.length} fluff ${fluff.length}`);
+    const spells = responseSpells.data.spell;
+    const fluff = responseSpellsFluff.data.spellFluff;
+    console.log(
+      `counts ${filename} spells ${spells.length} fluff ${fluff.length}`
+    );
     const newSpells = await Promise.all(
       spells.map((item) => {
         let itemFluff = {};
@@ -27,7 +35,6 @@ const main = async (filename) => {
           id: `${item.name.replace(/\W/g, "")}-${item.source}-${
             item.page
           }`.toLowerCase(),
-          // ..._.merge(item, itemFluff),
           ...item,
           images: itemFluff.images || [],
           entriesFluff: itemFluff.entries || [],
@@ -44,13 +51,24 @@ const main = async (filename) => {
   try {
     await client.connect();
     const dbo = client.db("5e");
-    var text = await main("phb");
-    await Promise.all(
-      text.map(async (item) => {
-        const query = { id: item.id };
-        const update = { $set: item };
-        const options = { upsert: true };
-        await dbo.collection("spells").updateOne(query, update, options);
+    const responseIndex = await axios.get(
+      "https://5e.tools/data/spells/index.json"
+    );
+    await Promise.allSettled(
+      spellSources.map(async (source) => {
+        const sourceJson = responseIndex.data[source] || null;
+        console.log("sour", sourceJson);
+        if (sourceJson !== null) {
+          const result = await main(sourceJson);
+          await Promise.all(
+            result.map(async (item) => {
+              const query = { id: item.id };
+              const update = { $set: item };
+              const options = { upsert: true };
+              await dbo.collection("spells").updateOne(query, update, options);
+            })
+          );
+        }
       })
     );
   } catch (e) {

@@ -31,7 +31,6 @@ const main = async () => {
             item.page
           }`.toLowerCase(),
           base: false,
-          // ..._.merge(item, itemFluff),
           ...item,
           images: itemFluff?.images || [],
           entriesFluff: itemFluff?.entries || [],

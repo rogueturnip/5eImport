@@ -1,4 +1,3 @@
-import fs from "fs";
 import _ from "lodash";
 import axios from "axios";
 import { default as mongodb } from "mongodb";
@@ -34,7 +33,6 @@ const main = async () => {
           ...item,
           images: itemFluff.images || [],
           entriesFluff: itemFluff.entries || [],
-          // ..._.merge(item, itemFluff),
         };
       })
     );
