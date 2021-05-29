@@ -1,20 +1,25 @@
 import fs from "fs";
 import _ from "lodash";
+import axios from "axios";
 import { default as mongodb } from "mongodb";
 
-const uri = "";
+import dotenv from "dotenv";
+dotenv.config();
+
+const uri = process.env.MONGODB;
 const client = new mongodb.MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 const main = async () => {
-  const directoryPath = "/home/tony/projects/TheGiddyLimit.github.io/data";
-  const racesFile = `${directoryPath}/races.json`;
-  const fluffFile = `${directoryPath}/fluff-races.json`;
+  const responseItems = await axios.get("https://5e.tools/data/races.json");
+  const responseItemsFluff = await axios.get(
+    "https://5e.tools/data/fluff-races.json"
+  );
   try {
-    const races = JSON.parse(fs.readFileSync(racesFile, "utf8")).race;
-    const fluff = JSON.parse(fs.readFileSync(fluffFile, "utf8")).raceFluff;
+    const races = responseItems.data.race;
+    const fluff = responseItemsFluff.data.raceFluff;
     console.log(`count items ${races.length} fluff ${fluff.length}`);
     const newRaces = await Promise.all(
       races.map((item) => {

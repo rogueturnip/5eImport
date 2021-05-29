@@ -1,9 +1,12 @@
 import fs from "fs";
 import _ from "lodash";
+import axios from "axios";
 import { default as mongodb } from "mongodb";
 // import * as parser from "./parser.js";
 
-const uri = "";
+import dotenv from "dotenv";
+dotenv.config();
+const uri = process.env.MONGODB;
 const client = new mongodb.MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

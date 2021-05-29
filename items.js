@@ -1,20 +1,24 @@
-import fs from "fs";
 import _ from "lodash";
+import axios from "axios";
 import { default as mongodb } from "mongodb";
 
-const uri = "";
+import dotenv from "dotenv";
+dotenv.config();
+
+const uri = process.env.MONGODB;
 const client = new mongodb.MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 const main = async () => {
-  const directoryPath = "/home/tony/projects/TheGiddyLimit.github.io/data";
-  const itemsFile = `${directoryPath}/items.json`;
-  const fluffFile = `${directoryPath}/fluff-items.json`;
+  const responseItems = await axios.get("https://5e.tools/data/items.json");
+  const responseItemsFluff = await axios.get(
+    "https://5e.tools/data/fluff-items.json"
+  );
   try {
-    const items = JSON.parse(fs.readFileSync(itemsFile, "utf8")).item;
-    const fluff = JSON.parse(fs.readFileSync(fluffFile, "utf8")).itemFluff;
+    const items = responseItems.data.item;
+    const fluff = responseItemsFluff.data.itemFluff;
     console.log(`count items ${items.length} fluff ${fluff.length}`);
     const newItems = await Promise.all(
       items.map((item) => {
@@ -30,6 +34,7 @@ const main = async () => {
           // ..._.merge(item, itemFluff),
           ...item,
           images: itemFluff?.images || [],
+          entriesFluff: itemFluff?.entries || [],
         };
       })
     );

@@ -1,18 +1,22 @@
-import fs from "fs";
 import _ from "lodash";
+import axios from "axios";
 import { default as mongodb } from "mongodb";
 
-const uri = "";
+import dotenv from "dotenv";
+dotenv.config();
+
+const uri = process.env.MONGODB;
 const client = new mongodb.MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 const main = async () => {
-  const directoryPath = "/home/tony/projects/TheGiddyLimit.github.io/data";
-  const itemsFile = `${directoryPath}/items-base.json`;
+  const responseItems = await axios.get(
+    "https://5e.tools/data/items-base.json"
+  );
   try {
-    const items = JSON.parse(fs.readFileSync(itemsFile, "utf8")).baseitem;
+    const items = responseItems.data.baseitem;
     console.log(`count ${items.length}`);
     const newItems = await Promise.all(
       items.map((item) => {
