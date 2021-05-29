@@ -45,7 +45,7 @@ const main = async () => {
 (async () => {
   try {
     await client.connect();
-    const dbo = client.db("5e");
+    const dbo = client.db(process.env.DBNAME);
     var text = await main();
     await Promise.all(
       text.map(async (item) => {

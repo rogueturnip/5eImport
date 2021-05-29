@@ -70,7 +70,7 @@ const main = async (filename) => {
 (async () => {
   try {
     await client.connect();
-    const dbo = client.db("5e");
+    const dbo = client.db(process.env.DBNAME);
     const responseIndex = await axios.get(
       "https://5e.tools/data/bestiary/index.json"
     );
