@@ -83,7 +83,6 @@ const main = async () => {
             const newFeatures = subclass?.subclassFeatures?.map((feature) => {
               let values = feature.split("|");
               values[4] = _.isEmpty(values[4]) ? "PHB" : values[4];
-              console.log(values);
               // don't process class features from sources not supported
               if (!classSources.includes(values[4])) return null;
               return {
