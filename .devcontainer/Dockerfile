@@ -2,6 +2,14 @@
 ARG VARIANT=16-bullseye
 FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-${VARIANT}
 
+# ARG USERNAME=node
+
+# RUN mkdir -p /home/$USERNAME/.vscode-server/extensions \
+#         /home/$USERNAME/.vscode-server-insiders/extensions \
+#     && chown -R $USERNAME \
+#         /home/$USERNAME/.vscode-server \
+#         /home/$USERNAME/.vscode-server-insiders
+
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
