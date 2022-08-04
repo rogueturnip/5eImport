@@ -1,7 +1,7 @@
 {
   "name": "5eimport",
   "version": "1.0.0",
-  "description": "",
+  "description": "Import JSON files from 5eTools to a mongodb for other use.  Combines each with their fluff file.",
   "main": "index.js",
   "type": "module",
   "scripts": {
