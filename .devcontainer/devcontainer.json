@@ -32,7 +32,7 @@
     "aws-cli": "latest"
   },
   "mounts": [
-    "source=${env:HOME}${env:USERPROFILE}/.aws,target=/home/node/.aws,type=bind",
+    "source=${env:HOME}${env:USERPROFILE}/.aws,target=/home/node/.aws,type=bind"
     // "source=vscode-extensions,target=/home/node/.vscode-server/extensions,type=volume",
     // And/or for VS Code Insiders
     // "source=vscode-extensions-insider,target=/home/node/.vscode-server-insiders/extensions,type=volume"
