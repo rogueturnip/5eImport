@@ -15,7 +15,7 @@
     // Configure properties specific to VS Code.
     "vscode": {
       // Add the IDs of extensions you want installed when the container is created.
-      "extensions": ["dbaeumer.vscode-eslint"]
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
     }
   },
 
@@ -31,8 +31,15 @@
     "git": "latest",
     "aws-cli": "latest"
   },
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb",
+    "storage": "16gb"
+  },
   "mounts": [
-    "source=${env:HOME}${env:USERPROFILE}/.aws,target=/home/node/.aws,type=bind"
+    "source=${env:HOME}/.aws,target=/home/node/.aws,type=bind",
+    "source=${env:HOME}/.gitconfig,target=/home/node/.gitconfig,type=bind",
+    "source=${env:HOME}/.ssh,target=/home/node/.ssh,type=bind"
     // "source=vscode-extensions,target=/home/node/.vscode-server/extensions,type=volume",
     // And/or for VS Code Insiders
     // "source=vscode-extensions-insider,target=/home/node/.vscode-server-insiders/extensions,type=volume"
