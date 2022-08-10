@@ -39,6 +39,7 @@
   "mounts": [
     "source=${env:HOME}/.aws,target=/home/node/.aws,type=bind",
     "source=${env:HOME}/.gitconfig,target=/home/node/.gitconfig,type=bind",
+    "source=${env:HOME}/.npm,target=/home/node/.npm,type=bind",
     "source=${env:HOME}/.ssh,target=/home/node/.ssh,type=bind"
     // "source=vscode-extensions,target=/home/node/.vscode-server/extensions,type=volume",
     // And/or for VS Code Insiders
